@@ -19,6 +19,7 @@ export interface Address {
 export interface OrderRequest {
   'id' : bigint,
   'customerName' : string,
+  'status' : OrderStatus,
   'deliveryAddress' : Address,
   'paymentMethod' : PaymentMethod,
   'note' : [] | [string],
@@ -26,6 +27,11 @@ export interface OrderRequest {
   'products' : Array<[Product, bigint]>,
   'contactDetails' : string,
 }
+export type OrderStatus = { 'shipped' : null } |
+  { 'cancelled' : null } |
+  { 'pending' : null } |
+  { 'delivered' : null } |
+  { 'inProgress' : null };
 export type PaymentMethod = { 'cod' : null } |
   { 'upi' : UpiPaymentData };
 export interface Product {
@@ -76,6 +82,7 @@ export interface _SERVICE {
     bigint
   >,
   'toggleProductStock' : ActorMethod<[bigint], undefined>,
+  'updateOrderStatus' : ActorMethod<[bigint, OrderStatus], undefined>,
   'updateProduct' : ActorMethod<
     [bigint, string, bigint, string, string, string],
     undefined

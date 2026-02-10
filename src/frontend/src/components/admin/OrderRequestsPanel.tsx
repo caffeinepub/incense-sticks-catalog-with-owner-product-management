@@ -1,5 +1,5 @@
-import { useGetAllOrderRequests, useDeleteOrderRequest } from '../../hooks/useOrderRequests';
-import { type OrderRequest } from '../../backend';
+import { useGetAllOrderRequests, useDeleteOrderRequest, useUpdateOrderStatus } from '../../hooks/useOrderRequests';
+import { type OrderRequest, OrderStatus } from '../../backend';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Accordion,
@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Mail, Phone, Banknote, CreditCard, MapPin } from 'lucide-react';
+import { Trash2, Mail, Phone, Banknote, CreditCard, MapPin, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -24,12 +24,49 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 import { formatINR } from '../../utils/currency';
+import OrderStatusSelect from './OrderStatusSelect';
+
+function getStatusLabel(status: OrderStatus): string {
+  switch (status) {
+    case OrderStatus.pending:
+      return 'Pending';
+    case OrderStatus.inProgress:
+      return 'Packed';
+    case OrderStatus.shipped:
+      return 'Out for Delivery';
+    case OrderStatus.delivered:
+      return 'Delivered';
+    case OrderStatus.cancelled:
+      return 'Cancelled';
+    default:
+      return 'Unknown';
+  }
+}
+
+function getStatusVariant(status: OrderStatus): 'default' | 'secondary' | 'outline' | 'destructive' {
+  switch (status) {
+    case OrderStatus.pending:
+      return 'outline';
+    case OrderStatus.inProgress:
+      return 'secondary';
+    case OrderStatus.shipped:
+      return 'default';
+    case OrderStatus.delivered:
+      return 'default';
+    case OrderStatus.cancelled:
+      return 'destructive';
+    default:
+      return 'outline';
+  }
+}
 
 export default function OrderRequestsPanel() {
   const { data: orders, isLoading } = useGetAllOrderRequests();
   const deleteOrder = useDeleteOrderRequest();
+  const updateStatus = useUpdateOrderStatus();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<OrderRequest | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<bigint | null>(null);
 
   const handleDeleteClick = (order: OrderRequest) => {
     setOrderToDelete(order);
@@ -46,6 +83,18 @@ export default function OrderRequestsPanel() {
       setOrderToDelete(null);
     } catch (error) {
       toast.error('Failed to delete order request');
+    }
+  };
+
+  const handleStatusChange = async (orderId: bigint, newStatus: OrderStatus) => {
+    setUpdatingOrderId(orderId);
+    try {
+      await updateStatus.mutateAsync({ orderId, status: newStatus });
+      toast.success('Order status updated');
+    } catch (error) {
+      toast.error('Failed to update order status');
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
@@ -100,6 +149,8 @@ export default function OrderRequestsPanel() {
               const paymentMethodLabel = order.paymentMethod.__kind__ === 'cod' ? 'COD' : 'UPI';
               const PaymentIcon = order.paymentMethod.__kind__ === 'cod' ? Banknote : CreditCard;
 
+              const isUpdating = updatingOrderId === order.id;
+
               return (
                 <AccordionItem key={order.id.toString()} value={order.id.toString()}>
                   <AccordionTrigger className="hover:no-underline">
@@ -111,6 +162,10 @@ export default function OrderRequestsPanel() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        <Badge variant={getStatusVariant(order.status)} className="gap-1">
+                          <Package className="h-3 w-3" />
+                          {getStatusLabel(order.status)}
+                        </Badge>
                         <Badge variant="outline" className="gap-1">
                           <PaymentIcon className="h-3 w-3" />
                           {paymentMethodLabel}
@@ -121,6 +176,16 @@ export default function OrderRequestsPanel() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-4 pt-4">
+                      {/* Order Status Control */}
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-sm">Order Status</h4>
+                        <OrderStatusSelect
+                          value={order.status}
+                          onChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                          disabled={isUpdating}
+                        />
+                      </div>
+
                       {/* Contact Details */}
                       <div className="space-y-2">
                         <h4 className="font-semibold text-sm">Contact Information</h4>

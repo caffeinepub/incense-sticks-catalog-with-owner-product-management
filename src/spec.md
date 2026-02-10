@@ -1,15 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Collect delivery address details at checkout and apply a ₹80 shipping fee for deliveries outside Gurugram, reflected consistently across customer checkout, admin views, and backend storage.
+**Goal:** Add clearly labeled public email and Instagram contact links to the Harmony Incense site footer.
 
 **Planned changes:**
-- Update OrderRequestPage to collect delivery details (at minimum: Delivery Address and Delivery City) with required-field validation and English error messages.
-- Add a location-based shipping rule driven by Delivery City (case-insensitive, trimmed): Gurugram => ₹0 shipping; otherwise => ₹80 shipping.
-- Update the order summary and UPI payment section to show an INR-formatted breakdown (Items subtotal, Shipping, Total payable) and use Total payable as the Amount to Pay.
-- Extend the order submission payload to include delivery address/city so it is persisted and shown in the admin Order Requests UI.
-- Update admin Order Requests to display delivery address details and show totals including a separate shipping line item when non-zero.
-- Update backend OrderRequest schema and submitOrderRequest to store delivery fields and shippingFee in paise, computed/enforced on the backend (outside Gurugram => 8000 paise; otherwise 0).
-- Add a conditional backend migration to preserve existing stored orders by populating new fields with safe defaults and avoiding upgrade traps.
+- Update the footer to include an email contact link using `mailto:viraajdudeja12@gmail.com` with an English label.
+- Update the footer to include an Instagram link pointing exactly to `https://www.instagram.com/harmonyincense.in?igsh=bnR4a3FhYzFidXJy&utm_source=qr`, opening in a new tab with `rel="noopener noreferrer"`.
+- Keep existing footer content (copyright, caffeine.ai attribution) present and functional.
 
-**User-visible outcome:** Customers can enter a delivery address and city during checkout, see shipping (₹0 in Gurugram or ₹80 outside) and a correct total payable for UPI; admins can view delivery details and shipping-inclusive totals for each order.
+**User-visible outcome:** Visitors can click labeled Email and Instagram links in the site footer to contact Harmony Incense or open the Instagram page.

@@ -7,12 +7,6 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface Address {
-    city: string;
-    pinCode: string;
-    landmark: string;
-    firstLine: string;
-}
 export interface Product {
     id: bigint;
     inStock: boolean;
@@ -21,6 +15,12 @@ export interface Product {
     photoUrl: string;
     scent: string;
     price: bigint;
+}
+export interface Address {
+    city: string;
+    pinCode: string;
+    landmark: string;
+    firstLine: string;
 }
 export type PaymentMethod = {
     __kind__: "cod";
@@ -39,6 +39,7 @@ export interface UserProfile {
 export interface OrderRequest {
     id: bigint;
     customerName: string;
+    status: OrderStatus;
     deliveryAddress: Address;
     paymentMethod: PaymentMethod;
     note?: string;
@@ -46,6 +47,22 @@ export interface OrderRequest {
     products: Array<[Product, bigint]>;
     contactDetails: string;
 }
+export type OrderStatus = {
+    __kind__: "pending";
+    pending: null;
+} | {
+    __kind__: "inProgress";
+    inProgress: null;
+} | {
+    __kind__: "shipped";
+    shipped: null;
+} | {
+    __kind__: "delivered";
+    delivered: null;
+} | {
+    __kind__: "cancelled";
+    cancelled: null;
+};
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -68,5 +85,6 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitOrderRequest(productsWithQuantity: Array<[Product, bigint]>, customerName: string, contactDetails: string, note: string | null, deliveryAddress: Address, paymentMethod: PaymentMethod): Promise<bigint>;
     toggleProductStock(productId: bigint): Promise<void>;
+    updateOrderStatus(orderId: bigint, status: OrderStatus): Promise<void>;
     updateProduct(productId: bigint, name: string, price: bigint, description: string, scent: string, photoUrl: string): Promise<void>;
 }

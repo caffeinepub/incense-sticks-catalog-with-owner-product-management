@@ -1,60 +1,23 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Location-based shipping fee (₹80 outside Gurugram) in checkout and admin orders",
+  "title": "Add email and Instagram contact links to site footer",
   "requirements": [
     {
-      "id": "REQ-35",
-      "summary": "Collect delivery address on OrderRequestPage and apply shipping fee rule (₹0 for Gurugram; ₹80 otherwise) in the order summary and UPI amount-to-pay.",
+      "id": "REQ-44",
+      "summary": "Add clearly labeled email (mailto) and Instagram contact links to the public site footer without altering existing footer content.",
       "acceptanceCriteria": [
-        "OrderRequestPage includes delivery fields with clear English labels (at minimum: \"Delivery Address\" and \"Delivery City\").",
-        "Delivery City input drives shipping: when the city equals \"Gurugram\" (ignoring case/whitespace), shipping shown is ₹0; otherwise shipping shown is ₹80.",
-        "The order summary shows a clear breakdown: Items subtotal, Shipping, and Total payable, all formatted in INR using the existing formatter.",
-        "The \"Amount to Pay\" displayed in the UPI payment section uses the total payable amount (subtotal + shipping).",
-        "Form validation prevents submission when required delivery fields are empty, with user-facing errors in English."
+        "The footer displays a clearly labeled email contact link that uses a mailto: URL for viraajdudeja12@gmail.com.",
+        "The footer displays a clearly labeled Instagram link that uses exactly: https://www.instagram.com/harmonyincense.in?igsh=bnR4a3FhYzFidXJy&utm_source=qr",
+        "The Instagram link opens in a new tab/window and uses rel=\"noopener noreferrer\".",
+        "All user-facing labels for these links are in English.",
+        "Existing footer content (copyright, caffeine.ai attribution) remains present and functional."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/shipping.ts",
-          "operation": "create",
-          "description": "Add a small shipping utility to compute the shipping fee in paise (BigInt) using the rule: trimmed, case-insensitive comparison to \"Gurugram\" => 0n else 8000n; include a helper to normalize/compare city input while preserving paise-based calculations."
-        },
-        {
-          "path": "frontend/src/pages/OrderRequestPage.tsx",
+          "path": "frontend/src/components/Footer.tsx",
           "operation": "modify",
-          "description": "Add delivery address state and inputs (at minimum Delivery Address and Delivery City, English labels), validate required delivery fields before submission with English toast errors, compute subtotal/shipping/total payable using BigInt paise arithmetic, render an order summary breakdown (Items subtotal, Shipping, Total payable) using formatINR, and update the UPI \"Amount to Pay\" to use total payable (subtotal + computed shipping)."
-        },
-        {
-          "path": "frontend/src/hooks/useOrderRequests.ts",
-          "operation": "modify",
-          "description": "Extend the submit-order hook params to accept delivery address fields and pass deliveryAddress to the backend submitOrderRequest call (using Address shape and paise-based approach; do not send a client-computed shipping fee for correctness)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "summary": "Include delivery address/city in the order submission payload and display delivery details plus totals including shipping in the admin Order Requests UI.",
-      "acceptanceCriteria": [
-        "Order submission includes delivery address data so it is persisted with the order request and visible to the admin.",
-        "Admin Order Requests view shows delivery address details for each order (at minimum: delivery city and full delivery address).",
-        "Admin Order Requests totals reflect subtotal + shipping, and shipping is displayed as a separate line item when non-zero.",
-        "All displayed monetary values are formatted consistently in INR."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/OrderRequestPage.tsx",
-          "operation": "modify",
-          "description": "Update the submit payload to include deliveryAddress (including delivery city and full delivery address; populate any additional required Address fields with safe strings if not collected) so the backend can persist it with the order request."
-        },
-        {
-          "path": "frontend/src/components/admin/OrderRequestsPanel.tsx",
-          "operation": "modify",
-          "description": "Update admin order rendering to show delivery address details (at minimum delivery city and full delivery address) and update totals to reflect subtotal + shippingFee; display Shipping as a separate line item when shippingFee is non-zero; ensure all money values use formatINR and the accordion header total reflects total payable."
-        },
-        {
-          "path": "frontend/src/utils/shipping.ts",
-          "operation": "modify",
-          "description": "Export any additional helpers needed by admin UI (if applicable) to compute and/or label totals consistently while keeping BigInt paise handling; ensure usage stays aligned with the Gurugram rule."
+          "description": "Update the footer JSX to include two additional public contact links: (1) an Email link labeled in English (e.g., \"Email\") using mailto:viraajdudeja12@gmail.com, and (2) an Instagram link labeled in English (e.g., \"Instagram\") using exactly https://www.instagram.com/harmonyincense.in?igsh=bnR4a3FhYzFidXJy&utm_source=qr with target=\"_blank\" and rel=\"noopener noreferrer\". Ensure the existing copyright text and the caffeine.ai attribution link remain present and continue to work."
         }
       ]
     }

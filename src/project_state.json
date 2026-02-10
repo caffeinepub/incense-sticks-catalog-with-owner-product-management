@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 27,
+  "projectStateVersion": 31,
   "summary": "Build an incense sticks shopping app with a public storefront and owner/admin product management, evolving checkout from a simple order request into a flow where customers must complete payment before confirming/submitting their orders, and applying a location-based shipping charge when delivery is outside Gurugram.",
   "architectural_notes": [
     "Generated product images must live in the frontend public assets folder and products must reference them via a valid photoUrl/path; do not serve generated images via the backend.",
@@ -262,6 +262,30 @@
         "REQ-36"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-order-requests-ui-to-display-each-order-s-status-and-provide-an-in-place-control-to-change-status-for-any-order-persisting-the-change-via-the-backend-and-reflecting-the-updated-value-in-the-list-and-details-view",
+      "title": "Update the Admin \"Order Requests\" UI to display each order’s status and provide an in-place control to change status for any order, persisting the change via the backend and reflecting the updated value in the list and details view.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-existing-order-requests-react-query-hooks-to-support-updating-order-status-mutation-cache-invalidation-and-ensure-order-status-is-included-in-normalized-order-request-data-consumed-by-the-admin-ui",
+      "title": "Extend the existing order-requests React Query hooks to support updating order status (mutation + cache invalidation) and ensure order status is included in normalized order request data consumed by the admin UI.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-public-contact-links-to-the-site-footer-including-1-an-email-link-for-viraajdudeja12-gmail-com-and-2-an-instagram-link-to-https-www-instagram-com-harmonyincense-in-igsh-bnr4a3fhyzfidxjy-utm-source-qr-using-clear-english-labels",
+      "title": "Add public contact links to the site footer, including (1) an email link for viraajdudeja12@gmail.com and (2) an Instagram link to https://www.instagram.com/harmonyincense.in?igsh=bnR4a3FhYzFidXJy&utm_source=qr, using clear English labels.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -373,6 +397,42 @@
       "reqIds": [
         "REQ-38"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add order status tracking to admin order management (e.g., Pending, Packed, Out for Delivery, Delivered) so the owner can update and track each order’s fulfillment state.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Extend the backend order model to include an order fulfillment status field, and ensure every order (new and existing) has a valid status value.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Add an admin-only backend API to update an order’s status, with validation that only supported statuses can be set and that non-admin callers are rejected with a clear trap message.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Add a conditional Motoko state migration so that upgrading a canister with existing stored orders preserves state and populates the new order status field with a safe default (\"Pending\") for older orders.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Add public contact links to the site (display email viraajdudeja12@gmail.com and Instagram https://www.instagram.com/harmonyincense.in?igsh=bnR4a3FhYzFidXJy&utm_source=qr in an appropriate place like footer/header/contact section).",
+      "reqIds": [],
       "status": "pending"
     }
   ],

@@ -13,6 +13,13 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const OrderStatus = IDL.Variant({
+  'shipped' : IDL.Null,
+  'cancelled' : IDL.Null,
+  'pending' : IDL.Null,
+  'delivered' : IDL.Null,
+  'inProgress' : IDL.Null,
+});
 export const Address = IDL.Record({
   'city' : IDL.Text,
   'pinCode' : IDL.Text,
@@ -39,6 +46,7 @@ export const Product = IDL.Record({
 export const OrderRequest = IDL.Record({
   'id' : IDL.Nat,
   'customerName' : IDL.Text,
+  'status' : OrderStatus,
   'deliveryAddress' : Address,
   'paymentMethod' : PaymentMethod,
   'note' : IDL.Opt(IDL.Text),
@@ -85,6 +93,7 @@ export const idlService = IDL.Service({
       [],
     ),
   'toggleProductStock' : IDL.Func([IDL.Nat], [], []),
+  'updateOrderStatus' : IDL.Func([IDL.Nat, OrderStatus], [], []),
   'updateProduct' : IDL.Func(
       [IDL.Nat, IDL.Text, IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
       [],
@@ -99,6 +108,13 @@ export const idlFactory = ({ IDL }) => {
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const OrderStatus = IDL.Variant({
+    'shipped' : IDL.Null,
+    'cancelled' : IDL.Null,
+    'pending' : IDL.Null,
+    'delivered' : IDL.Null,
+    'inProgress' : IDL.Null,
   });
   const Address = IDL.Record({
     'city' : IDL.Text,
@@ -126,6 +142,7 @@ export const idlFactory = ({ IDL }) => {
   const OrderRequest = IDL.Record({
     'id' : IDL.Nat,
     'customerName' : IDL.Text,
+    'status' : OrderStatus,
     'deliveryAddress' : Address,
     'paymentMethod' : PaymentMethod,
     'note' : IDL.Opt(IDL.Text),
@@ -172,6 +189,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'toggleProductStock' : IDL.Func([IDL.Nat], [], []),
+    'updateOrderStatus' : IDL.Func([IDL.Nat, OrderStatus], [], []),
     'updateProduct' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
         [],

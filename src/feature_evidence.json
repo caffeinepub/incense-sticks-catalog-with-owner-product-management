@@ -2,12 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-customer-checkout-orderrequestpage-to-collect-delivery-address-details-and-apply-a-location-based-shipping-fee-rule-if-the-delivery-city-is-not-gurugram-case-insensitive-trimmed-comparison-add-a-shipping-charge-of-80-to-the-payable-total-if-it-is-gurugram-shipping-is-0",
-      "featureTitle": "Update the customer checkout (OrderRequestPage) to collect delivery address details and apply a location-based shipping fee rule: if the delivery city is not \"Gurugram\" (case-insensitive, trimmed comparison), add a shipping charge of ₹80 to the payable total; if it is Gurugram, shipping is ₹0.",
+      "featureId": "feature-add-public-contact-links-to-the-site-footer-including-1-an-email-link-for-viraajdudeja12-gmail-com-and-2-an-instagram-link-to-https-www-instagram-com-harmonyincense-in-igsh-bnr4a3fhyzfidxjy-utm-source-qr-using-clear-english-labels",
+      "featureTitle": "Add public contact links to the site footer, including (1) an email link for viraajdudeja12@gmail.com and (2) an Instagram link to https://www.instagram.com/harmonyincense.in?igsh=bnR4a3FhYzFidXJy&utm_source=qr, using clear English labels.",
       "files": [
-        "frontend/src/hooks/useOrderRequests.ts",
-        "frontend/src/pages/OrderRequestPage.tsx",
-        "frontend/src/utils/shipping.ts"
+        "frontend/src/components/Footer.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,28 +16,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-35"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-extend-order-submission-payload-from-the-frontend-to-include-the-entered-delivery-address-city-and-any-necessary-derived-shipping-info-and-update-the-admin-order-requests-ui-to-display-delivery-address-details-and-show-totals-including-shipping",
-      "featureTitle": "Extend order submission payload from the frontend to include the entered delivery address/city (and any necessary derived shipping info), and update the admin Order Requests UI to display delivery address details and show totals including shipping.",
-      "files": [
-        "frontend/src/components/admin/OrderRequestsPanel.tsx",
-        "frontend/src/pages/OrderRequestPage.tsx",
-        "frontend/src/utils/shipping.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-36"
+        "REQ-44"
       ],
       "confidence": "high"
     }

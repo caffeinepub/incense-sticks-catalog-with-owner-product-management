@@ -6,9 +6,9 @@ import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -44,6 +44,14 @@ actor {
     transactionId : ?Text;
   };
 
+  public type OrderStatus = {
+    #pending;
+    #inProgress;
+    #shipped;
+    #delivered;
+    #cancelled;
+  };
+
   public type OrderRequest = {
     id : Nat;
     products : [(Product, Nat)];
@@ -53,14 +61,15 @@ actor {
     deliveryAddress : Address;
     shippingFee : Nat;
     paymentMethod : PaymentMethod;
+    status : OrderStatus;
   };
+
+  var nextProductId = 4;
+  var nextOrderRequestId = 0;
 
   let userProfiles = Map.empty<Principal, UserProfile>();
   let products = Map.empty<Nat, Product>();
   let orderRequests = Map.empty<Nat, OrderRequest>();
-
-  var nextProductId = 4;
-  var nextOrderRequestId = 0;
 
   // User Profile Management
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -214,6 +223,7 @@ actor {
       deliveryAddress;
       shippingFee;
       paymentMethod;
+      status = #pending;
     };
 
     orderRequests.add(orderId, orderRequest);
@@ -258,5 +268,19 @@ actor {
       Runtime.trap("Order request not found");
     };
     orderRequests.remove(orderId);
+  };
+
+  public shared ({ caller }) func updateOrderStatus(orderId : Nat, status : OrderStatus) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update order status");
+    };
+
+    let orderRequest = switch (orderRequests.get(orderId)) {
+      case (null) { Runtime.trap("Order request not found") };
+      case (?o) { o };
+    };
+
+    let newOrderRequest = { orderRequest with status };
+    orderRequests.add(orderId, newOrderRequest);
   };
 };

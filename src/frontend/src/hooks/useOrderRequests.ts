@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActorState } from './useActorState';
-import { type OrderRequest, type Product, type PaymentMethod, type Address } from '../backend';
+import { type OrderRequest, type Product, type PaymentMethod, type Address, OrderStatus } from '../backend';
 import { normalizePriceToPaise } from '../utils/currency';
 import { getActorErrorMessage } from '../utils/actorErrorMessages';
 
@@ -89,6 +89,21 @@ export function useDeleteOrderRequest() {
     mutationFn: async (orderId: bigint) => {
       if (!actor) throw new Error('Actor not available');
       return actor.deleteOrderRequest(orderId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orderRequests'] });
+    },
+  });
+}
+
+export function useUpdateOrderStatus() {
+  const { actor } = useActorState();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ orderId, status }: { orderId: bigint; status: OrderStatus }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.updateOrderStatus(orderId, status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orderRequests'] });
