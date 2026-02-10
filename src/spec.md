@@ -1,11 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Fix INR price scaling so products intended to cost ₹299 display as ₹299.00 (not ₹2.99) across the entire app by ensuring backend-stored prices are consistently in paise to match the existing frontend `formatINR(price: bigint)` behavior.
+**Goal:** Collect delivery address details at checkout and apply a ₹80 shipping fee for deliveries outside Gurugram, reflected consistently across customer checkout, admin views, and backend storage.
 
 **Planned changes:**
-- Update backend product price storage/handling so `price` is consistently represented in paise (minor units) end-to-end.
-- Adjust admin product create/edit handling so entering rupee amounts like `299` or `299.00` results in a stored value that renders as `₹299.00` everywhere.
-- Verify all app locations that display prices (storefront catalog cards, product detail, admin product list, admin order request totals/line items) use the corrected stored value and no longer show `₹2.99` for intended `₹299`.
+- Update OrderRequestPage to collect delivery details (at minimum: Delivery Address and Delivery City) with required-field validation and English error messages.
+- Add a location-based shipping rule driven by Delivery City (case-insensitive, trimmed): Gurugram => ₹0 shipping; otherwise => ₹80 shipping.
+- Update the order summary and UPI payment section to show an INR-formatted breakdown (Items subtotal, Shipping, Total payable) and use Total payable as the Amount to Pay.
+- Extend the order submission payload to include delivery address/city so it is persisted and shown in the admin Order Requests UI.
+- Update admin Order Requests to display delivery address details and show totals including a separate shipping line item when non-zero.
+- Update backend OrderRequest schema and submitOrderRequest to store delivery fields and shippingFee in paise, computed/enforced on the backend (outside Gurugram => 8000 paise; otherwise 0).
+- Add a conditional backend migration to preserve existing stored orders by populating new fields with safe defaults and avoiding upgrade traps.
 
-**User-visible outcome:** Prices entered as ₹299 in the admin display as “₹299.00” everywhere in the storefront and admin views, and no part of the UI shows ₹2.99 for products intended to be ₹299.
+**User-visible outcome:** Customers can enter a delivery address and city during checkout, see shipping (₹0 in Gurugram or ₹80 outside) and a correct total payable for UPI; admins can view delivery details and shipping-inclusive totals for each order.

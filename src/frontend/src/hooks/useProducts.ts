@@ -21,6 +21,12 @@ export function useGetAllProducts() {
       return products.map(normalizeProduct);
     },
     enabled: !!actor && !actorFetching,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   // Combine actor initialization state with query loading state
@@ -42,6 +48,12 @@ export function useGetInStockProducts() {
       return products.map(normalizeProduct);
     },
     enabled: !!actor && !actorFetching,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   // Combine actor initialization state with query loading state

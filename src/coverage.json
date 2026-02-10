@@ -1,39 +1,58 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T12:17:36.880Z",
+  "generatedAt": "2026-02-10T13:17:42.147Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 4,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-13",
-        "summary": "Fix the product price scaling so a product intended to cost ₹299 displays as ₹299 (not ₹2.99) across the entire app, by ensuring the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter `formatINR(price: bigint)` that divides by 100.",
+        "id": "REQ-35",
+        "summary": "Update the customer checkout (OrderRequestPage) to collect delivery address details and apply a location-based shipping fee rule: if the delivery city is not \"Gurugram\" (case-insensitive, trimmed comparison), add a shipping charge of ₹80 to the payable total; if it is Gurugram, shipping is ₹0.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/currency.ts",
-          "frontend/src/hooks/useProducts.ts",
-          "frontend/src/hooks/useProduct.ts",
-          "frontend/src/hooks/useOrderRequests.ts",
-          "frontend/src/components/admin/ProductEditorDialog.tsx",
-          "frontend/src/hooks/useOrderDraft.ts",
+          "frontend/src/utils/shipping.ts",
           "frontend/src/pages/OrderRequestPage.tsx",
-          "frontend/src/components/admin/OrderRequestsPanel.tsx"
+          "frontend/src/hooks/useOrderRequests.ts"
         ],
         "matchedFiles": [
-          "frontend/src/utils/currency.ts",
-          "frontend/src/hooks/useProducts.ts",
-          "frontend/src/hooks/useProduct.ts",
-          "frontend/src/hooks/useOrderRequests.ts",
-          "frontend/src/components/admin/ProductEditorDialog.tsx",
-          "frontend/src/hooks/useOrderDraft.ts",
+          "frontend/src/utils/shipping.ts",
           "frontend/src/pages/OrderRequestPage.tsx",
-          "frontend/src/components/admin/OrderRequestsPanel.tsx"
+          "frontend/src/hooks/useOrderRequests.ts"
         ]
+      },
+      {
+        "id": "REQ-36",
+        "summary": "Extend order submission payload from the frontend to include the entered delivery address/city (and any necessary derived shipping info), and update the admin Order Requests UI to display delivery address details and show totals including shipping.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/OrderRequestPage.tsx",
+          "frontend/src/components/admin/OrderRequestsPanel.tsx",
+          "frontend/src/utils/shipping.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/OrderRequestPage.tsx",
+          "frontend/src/components/admin/OrderRequestsPanel.tsx",
+          "frontend/src/utils/shipping.ts"
+        ]
+      },
+      {
+        "id": "REQ-37",
+        "summary": "Update the backend OrderRequest model and submitOrderRequest method to store delivery details and a shipping fee amount, and compute/enforce the shipping fee rule on the backend: shippingFee = 8000 paise (₹80) when delivery city is outside Gurugram; otherwise 0 paise.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-38",
+        "summary": "Add a conditional migration to preserve existing canister state when upgrading the OrderRequest schema to include delivery fields and shipping fee, ensuring existing stored orders remain readable.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
@@ -44,14 +63,14 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
     "frontend/src/components/admin/OrderRequestsPanel.tsx",
-    "frontend/src/components/admin/ProductEditorDialog.tsx",
-    "frontend/src/hooks/useOrderDraft.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useOrderRequests.ts",
-    "frontend/src/hooks/useProduct.ts",
-    "frontend/src/hooks/useProducts.ts",
     "frontend/src/pages/OrderRequestPage.tsx",
-    "frontend/src/utils/currency.ts",
+    "frontend/src/utils/shipping.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

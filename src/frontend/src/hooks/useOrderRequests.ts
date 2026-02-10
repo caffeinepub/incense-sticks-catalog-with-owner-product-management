@@ -1,13 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { type OrderRequest, type Product } from '../backend';
+import { useActorState } from './useActorState';
+import { type OrderRequest, type Product, type PaymentMethod, type Address } from '../backend';
 import { normalizePriceToPaise } from '../utils/currency';
+import { getActorErrorMessage } from '../utils/actorErrorMessages';
 
 interface SubmitOrderRequestParams {
   productsWithQuantity: Array<[Product, bigint]>;
   customerName: string;
   contactDetails: string;
   note: string | null;
+  deliveryAddress: Address;
+  paymentMethod: PaymentMethod;
 }
 
 function normalizeProduct(product: Product): Product {
@@ -24,11 +27,12 @@ function normalizeOrderRequest(order: OrderRequest): OrderRequest {
       normalizeProduct(product),
       quantity,
     ]),
+    shippingFee: normalizePriceToPaise(order.shippingFee),
   };
 }
 
 export function useGetAllOrderRequests() {
-  const { actor, isFetching } = useActor();
+  const { actor, isFetching } = useActorState();
 
   return useQuery<OrderRequest[]>({
     queryKey: ['orderRequests'],
@@ -42,27 +46,43 @@ export function useGetAllOrderRequests() {
 }
 
 export function useSubmitOrderRequest() {
-  const { actor } = useActor();
+  const { actor, isReady, isError } = useActorState();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (params: SubmitOrderRequestParams) => {
-      if (!actor) throw new Error('Actor not available');
+      // Check if actor initialization failed
+      if (isError) {
+        throw new Error('Unable to connect to the service. Please retry or reload the page.');
+      }
+      
+      // Check if actor is not ready yet
+      if (!isReady || !actor) {
+        throw new Error('We are still connecting to the service. Please wait a moment and try again.');
+      }
+      
       return actor.submitOrderRequest(
         params.productsWithQuantity,
         params.customerName,
         params.contactDetails,
-        params.note
+        params.note,
+        params.deliveryAddress,
+        params.paymentMethod
       );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orderRequests'] });
     },
+    onError: (error) => {
+      // Transform error to user-friendly message
+      const message = getActorErrorMessage(error);
+      throw new Error(message);
+    },
   });
 }
 
 export function useDeleteOrderRequest() {
-  const { actor } = useActor();
+  const { actor } = useActorState();
   const queryClient = useQueryClient();
 
   return useMutation({

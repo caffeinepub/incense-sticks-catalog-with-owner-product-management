@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { paiseToRupees, rupeesToPaise } from '../../utils/currency';
+import { AlertCircle } from 'lucide-react';
 
 interface ProductEditorDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
   const [description, setDescription] = useState('');
   const [scent, setScent] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [photoUrlError, setPhotoUrlError] = useState('');
 
   useEffect(() => {
     if (product) {
@@ -46,7 +48,33 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
       setScent('');
       setPhotoUrl('');
     }
+    setPhotoUrlError('');
   }, [product, open]);
+
+  const validatePhotoUrl = (url: string): boolean => {
+    const trimmedUrl = url.trim();
+    
+    // Empty is allowed (will use placeholder)
+    if (trimmedUrl === '') {
+      setPhotoUrlError('');
+      return true;
+    }
+    
+    // Non-empty must start with /assets/
+    if (!trimmedUrl.startsWith('/assets/')) {
+      setPhotoUrlError('Photo URL must start with /assets/ (e.g., /assets/generated/lavender-incense.dim_800x800.png)');
+      return false;
+    }
+    
+    setPhotoUrlError('');
+    return true;
+  };
+
+  const handlePhotoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setPhotoUrl(newValue);
+    validatePhotoUrl(newValue);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +87,11 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
     const priceNum = parseFloat(price);
     if (isNaN(priceNum) || priceNum <= 0) {
       toast.error('Please enter a valid price');
+      return;
+    }
+
+    // Validate photo URL before submitting
+    if (!validatePhotoUrl(photoUrl)) {
       return;
     }
 
@@ -93,6 +126,7 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
   };
 
   const isPending = createProduct.isPending || updateProduct.isPending;
+  const hasPhotoUrlError = photoUrlError !== '';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -158,12 +192,20 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
             <Input
               id="photoUrl"
               value={photoUrl}
-              onChange={(e) => setPhotoUrl(e.target.value)}
-              placeholder="/assets/generated/incense-placeholder.dim_800x800.png"
+              onChange={handlePhotoUrlChange}
+              placeholder="/assets/generated/lavender-incense.dim_800x800.png"
+              className={hasPhotoUrlError ? 'border-destructive' : ''}
             />
-            <p className="text-xs text-muted-foreground">
-              Use /assets/generated/incense-placeholder.dim_800x800.png for placeholder
-            </p>
+            {hasPhotoUrlError ? (
+              <div className="flex items-start gap-2 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <span>{photoUrlError}</span>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Leave blank to use placeholder, or provide a path starting with /assets/
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
@@ -175,7 +217,7 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || hasPhotoUrlError}>
               {isPending ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
             </Button>
           </div>

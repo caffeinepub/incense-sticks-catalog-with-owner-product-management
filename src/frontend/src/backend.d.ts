@@ -7,15 +7,11 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface OrderRequest {
-    id: bigint;
-    customerName: string;
-    note?: string;
-    products: Array<[Product, bigint]>;
-    contactDetails: string;
-}
-export interface UserProfile {
-    name: string;
+export interface Address {
+    city: string;
+    pinCode: string;
+    landmark: string;
+    firstLine: string;
 }
 export interface Product {
     id: bigint;
@@ -25,6 +21,30 @@ export interface Product {
     photoUrl: string;
     scent: string;
     price: bigint;
+}
+export type PaymentMethod = {
+    __kind__: "cod";
+    cod: null;
+} | {
+    __kind__: "upi";
+    upi: UpiPaymentData;
+};
+export interface UpiPaymentData {
+    reference?: string;
+    transactionId?: string;
+}
+export interface UserProfile {
+    name: string;
+}
+export interface OrderRequest {
+    id: bigint;
+    customerName: string;
+    deliveryAddress: Address;
+    paymentMethod: PaymentMethod;
+    note?: string;
+    shippingFee: bigint;
+    products: Array<[Product, bigint]>;
+    contactDetails: string;
 }
 export enum UserRole {
     admin = "admin",
@@ -46,7 +66,7 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    submitOrderRequest(productsWithQuantity: Array<[Product, bigint]>, customerName: string, contactDetails: string, note: string | null): Promise<bigint>;
+    submitOrderRequest(productsWithQuantity: Array<[Product, bigint]>, customerName: string, contactDetails: string, note: string | null, deliveryAddress: Address, paymentMethod: PaymentMethod): Promise<bigint>;
     toggleProductStock(productId: bigint): Promise<void>;
     updateProduct(productId: bigint, name: string, price: bigint, description: string, scent: string, photoUrl: string): Promise<void>;
 }

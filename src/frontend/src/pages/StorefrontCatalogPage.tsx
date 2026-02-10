@@ -4,12 +4,16 @@ import { useGetAllProducts } from '../hooks/useProducts';
 import ProductCard from '../components/ProductCard';
 import ProductDiscoveryBar from '../components/ProductDiscoveryBar';
 import { useOrderDraft } from '../hooks/useOrderDraft';
+import { useActorState } from '../hooks/useActorState';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, Sparkles } from 'lucide-react';
+import { ShoppingBag, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { getActorErrorMessage } from '../utils/actorErrorMessages';
 
 export default function StorefrontCatalogPage() {
-  const { data: products, isLoading, isFetched, error } = useGetAllProducts();
+  const { data: products, isLoading, isFetched, error, refetch, isFetching } = useGetAllProducts();
+  const { isReady: actorReady } = useActorState();
   const { items } = useOrderDraft();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,15 +40,13 @@ export default function StorefrontCatalogPage() {
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  if (error) {
-    return (
-      <div className="container-custom py-12">
-        <div className="text-center">
-          <p className="text-destructive">Failed to load products. Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
+  const handleRetry = () => {
+    if (actorReady) {
+      refetch();
+    } else {
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -85,7 +87,28 @@ export default function StorefrontCatalogPage() {
           />
         </div>
 
-        {isLoading ? (
+        {/* Error Banner - shown when there's an error but doesn't block the page */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Unable to Load Products</AlertTitle>
+            <AlertDescription className="flex items-center justify-between gap-4">
+              <span>{getActorErrorMessage(error)}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRetry}
+                disabled={isFetching}
+                className="shrink-0"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+                {actorReady ? 'Retry' : 'Reload'}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {isLoading && !products ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="space-y-4">
@@ -103,13 +126,13 @@ export default function StorefrontCatalogPage() {
                 : 'No products available at the moment.'}
             </p>
           </div>
-        ) : (
+        ) : products && products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id.toString()} product={product} />
             ))}
           </div>
-        )}
+        ) : null}
       </section>
 
       {/* Floating Order Button */}

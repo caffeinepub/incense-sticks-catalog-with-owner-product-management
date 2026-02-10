@@ -1,13 +1,19 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
-  "summary": "Build an app for people who want to buy incense sticks, with the ability for the owner to add/manage products.",
-  "architectural_notes": [],
+  "projectStateVersion": 27,
+  "summary": "Build an incense sticks shopping app with a public storefront and owner/admin product management, evolving checkout from a simple order request into a flow where customers must complete payment before confirming/submitting their orders, and applying a location-based shipping charge when delivery is outside Gurugram.",
+  "architectural_notes": [
+    "Generated product images must live in the frontend public assets folder and products must reference them via a valid photoUrl/path; do not serve generated images via the backend.",
+    "Set the merchant UPI ID displayed in checkout to \"viraajdudeja@fam\" (replacing the previous placeholder \"merchant@upi\")."
+  ],
   "known_issues": [
     "Storefront displays 'no products available' because no active products are present/seeded until products are added via admin.",
-    "Product price is incorrectly displayed as ₹2.99 instead of ₹299 (likely decimal/scaling/formatting issue)."
+    "Product price is incorrectly displayed as ₹2.99 instead of ₹299 (likely decimal/scaling/formatting issue).",
+    "Product photos are not visible (app falls back to placeholder), likely due to missing generated image files in public assets and/or empty/incorrect photoUrl values for products.",
+    "Order confirmation/submission fails with an \"actor not available\" error when confirming the order (likely backend canister/actor init or network/deployment issue).",
+    "Storefront sometimes shows a \"failed to load products\" error instead of displaying the product catalog (likely product fetch/actor/network/deployment resilience issue)."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-a-public-storefront-that-lets-visitors-browse-incense-stick-products-in-a-clean-product-catalog-including-product-list-and-product-detail-views-with-name-price-description-scent-type-stock-availability-in-stock-out-of-stock-and-product-image",
@@ -104,6 +110,158 @@
         "REQ-13"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-generate-and-add-4-realistic-product-photo-images-for-the-seeded-products-lavender-vanilla-lemongrass-jasmine-as-static-assets-under-frontend-public-assets-generated-using-stable-filenames-that-can-be-referenced-by-product-photourl",
+      "title": "Generate and add 4 realistic product photo images for the seeded products (Lavender, Vanilla, Lemongrass, Jasmine) as static assets under frontend/public/assets/generated, using stable filenames that can be referenced by product.photoUrl.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-admin-product-editor-ux-safer-for-local-static-images-by-validating-and-guiding-photourl-input-when-a-user-enters-a-non-empty-photourl-it-must-be-either-an-absolute-in-app-path-starting-with-assets-or-left-blank-to-use-the-placeholder-show-a-clear-inline-validation-error-message-in-english-if-the-value-is-invalid",
+      "title": "Make the admin product editor UX safer for local static images by validating and guiding photoUrl input: when a user enters a non-empty photoUrl, it must be either an absolute in-app path starting with /assets/ or left blank to use the placeholder; show a clear inline validation error message in English if the value is invalid.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-checkout-order-request-page-to-let-visitors-choose-a-payment-method-cod-or-upi-before-submitting-the-order-request-using-clear-english-labels",
+      "title": "Update the checkout/order request page to let visitors choose a payment method (COD or UPI) before submitting the order request, using clear English labels.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-upi-is-selected-on-the-order-request-page-show-and-validate-upi-specific-input-fields-e-g-upi-id-and-or-transaction-reference-and-include-them-in-the-submit-payload-when-cod-is-selected-hide-disable-these-fields-and-do-not-send-them",
+      "title": "When UPI is selected on the order request page, show and validate UPI-specific input fields (e.g., UPI ID and/or transaction reference) and include them in the submit payload; when COD is selected, hide/disable these fields and do not send them.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-order-requests-view-to-display-the-payment-method-for-each-order-request-and-show-upi-details-when-present",
+      "title": "Update the admin Order Requests view to display the payment method for each order request and show UPI details when present.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-checkout-order-request-flow-so-customers-must-complete-payment-before-they-can-submit-confirm-an-order-remove-disable-cash-on-delivery-cod-and-enforce-upi-as-the-only-available-payment-method-in-the-customer-checkout-ui",
+      "title": "Update the checkout/order request flow so customers must complete payment before they can submit/confirm an order: remove/disable Cash on Delivery (COD) and enforce UPI as the only available payment method in the customer checkout UI.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-clear-upi-payment-step-in-the-order-request-page-that-shows-a-upi-qr-image-from-a-static-asset-and-requires-the-customer-to-provide-payment-proof-details-before-enabling-order-submission",
+      "title": "Add a clear UPI payment step in the Order Request page that shows a UPI QR image (from a static asset) and requires the customer to provide payment proof details before enabling order submission.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-post-checkout-confirmation-screen-copy-so-it-no-longer-implies-payment-will-be-arranged-later-and-instead-confirms-the-order-was-submitted-after-payment-details-were-provided",
+      "title": "Update the post-checkout confirmation screen copy so it no longer implies payment will be arranged later, and instead confirms the order was submitted after payment details were provided.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-customer-checkout-order-request-page-to-stop-displaying-the-upi-qr-image-and-instead-display-the-merchant-upi-id-as-plain-text-for-customers-to-pay",
+      "title": "Update the customer checkout/order request page to stop displaying the UPI QR image and instead display the merchant UPI ID as plain text for customers to pay.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-merchant-upi-id-value-centrally-configurable-in-the-frontend-and-ensure-the-ui-fails-safely-if-it-is-not-set",
+      "title": "Make the merchant UPI ID value centrally configurable in the frontend and ensure the UI fails safely if it is not set.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-centrally-configured-merchant-upi-id-constant-so-the-checkout-payment-ui-displays-viraajdudeja-fam-instead-of-merchant-upi",
+      "title": "Update the centrally configured merchant UPI ID constant so the checkout/payment UI displays \"viraajdudeja@fam\" instead of \"merchant@upi\".",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-prevent-order-submission-while-the-backend-actor-is-still-loading-and-show-a-clear-actionable-message-to-the-user-when-the-actor-is-not-ready-instead-of-throwing-the-raw-error-actor-not-available",
+      "title": "Prevent order submission while the backend actor is still loading, and show a clear, actionable message to the user when the actor is not ready (instead of throwing the raw error 'Actor not available').",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-explicit-error-handling-for-backend-actor-initialization-failures-so-that-if-actor-creation-initialization-fails-the-ui-surfaces-a-helpful-english-message-and-provides-a-recovery-action-e-g-retry-or-reload",
+      "title": "Add explicit error handling for backend actor initialization failures so that if actor creation/initialization fails, the UI surfaces a helpful English message and provides a recovery action (e.g., retry or reload).",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-order-submission-mutation-uses-actor-readiness-consistently-including-loading-state-so-that-order-submission-does-not-fail-due-to-the-actor-being-null-during-initial-render-refresh",
+      "title": "Ensure the order submission mutation uses actor readiness consistently (including loading state) so that order submission does not fail due to the actor being null during initial render/refresh.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-storefront-catalog-page-error-handling-so-it-does-not-hard-stop-with-only-failed-to-load-products-when-the-products-query-errors-instead-show-a-user-friendly-error-message-in-english-with-a-clear-recovery-action-retry-and-keep-rendering-any-previously-available-product-data-when-possible",
+      "title": "Update the storefront catalog page error handling so it does not hard-stop with only \"Failed to load products\" when the products query errors; instead, show a user-friendly error message (in English) with a clear recovery action (Retry) and keep rendering any previously available product data when possible.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-the-products-fetching-hook-s-so-transient-network-agent-errors-are-less-likely-to-surface-as-a-storefront-failure-by-enabling-sensible-react-query-resilience-defaults-for-product-lists-retry-with-backoff-keep-previous-data-and-refetch-on-reconnect-focus",
+      "title": "Improve the products fetching hook(s) so transient network/agent errors are less likely to surface as a storefront failure by enabling sensible React Query resilience defaults for product lists (retry with backoff, keep previous data, and refetch on reconnect/focus).",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-use-the-existing-actor-error-message-helper-s-to-display-more-specific-actionable-storefront-product-load-error-text-in-english-based-on-the-underlying-error-e-g-connecting-to-service-vs-network-issue-and-ensure-the-retry-action-is-appropriate-refetch-when-actor-is-ready-reload-only-if-actor-initialization-failed",
+      "title": "Use the existing actor error message helper(s) to display more specific, actionable storefront product-load error text (in English) based on the underlying error (e.g., connecting to service vs network issue), and ensure the Retry action is appropriate (refetch when actor is ready; reload only if actor initialization failed).",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-customer-checkout-orderrequestpage-to-collect-delivery-address-details-and-apply-a-location-based-shipping-fee-rule-if-the-delivery-city-is-not-gurugram-case-insensitive-trimmed-comparison-add-a-shipping-charge-of-80-to-the-payable-total-if-it-is-gurugram-shipping-is-0",
+      "title": "Update the customer checkout (OrderRequestPage) to collect delivery address details and apply a location-based shipping fee rule: if the delivery city is not \"Gurugram\" (case-insensitive, trimmed comparison), add a shipping charge of ₹80 to the payable total; if it is Gurugram, shipping is ₹0.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-order-submission-payload-from-the-frontend-to-include-the-entered-delivery-address-city-and-any-necessary-derived-shipping-info-and-update-the-admin-order-requests-ui-to-display-delivery-address-details-and-show-totals-including-shipping",
+      "title": "Extend order submission payload from the frontend to include the entered delivery address/city (and any necessary derived shipping info), and update the admin Order Requests UI to display delivery address details and show totals including shipping.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -131,6 +289,90 @@
       "id": "AR-4",
       "summary": "Rename the website/brand to \"Harmony Incense\" and display product prices in Indian Rupees (₹) across the storefront/admin",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Add/regenerate product photos for the seeded products (Lavender, Vanilla, Lemongrass, Jasmine) and ensure they are correctly stored in public assets and referenced so they display in the storefront/admin (not placeholders).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Ensure the backend seeds the 4 initial products with non-empty photoUrl values that point to the generated static assets (using absolute paths like /assets/generated/<filename>), so the storefront and product detail pages show real product photos instead of the placeholder on a fresh deployment.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add payment methods at checkout: Cash on Delivery (COD) and UPI",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Extend the backend order request model to store the customer-selected payment method, supporting exactly two methods: \"COD\" and \"UPI\".",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "If the selected payment method is UPI, store additional UPI-related customer input in the backend order request (e.g., UPI ID and/or transaction reference), and keep it optional/empty for COD.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Update checkout so customers must pay first and only then can confirm/submit their order (no unpaid order confirmations).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Enforce “paid before confirm” on the backend by rejecting unpaid submissions: update backend submitOrderRequest to disallow COD submissions and to require at least one non-empty UPI detail (reference or transactionId) when paymentMethod is UPI.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "In the checkout UPI payment step, do not show the UPI QR image; instead display the merchant UPI ID for customers to pay",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Fix storefront product loading so customers reliably see products: handle backend/network/actor failures with clear retry UI and fallback behavior so it doesn’t show 'failed to load products' in normal use.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Add a delivery-location-based shipping fee rule at checkout: if the delivery address is outside Gurugram, add ₹80 shipping cost (and include it in the order total/submission).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Update the backend OrderRequest model and submitOrderRequest method to store delivery details and a shipping fee amount, and compute/enforce the shipping fee rule on the backend: shippingFee = 8000 paise (₹80) when delivery city is outside Gurugram; otherwise 0 paise.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add a conditional migration to preserve existing canister state when upgrading the OrderRequest schema to include delivery fields and shipping fee, ensuring existing stored orders remain readable.",
+      "reqIds": [
+        "REQ-38"
+      ],
       "status": "pending"
     }
   ],

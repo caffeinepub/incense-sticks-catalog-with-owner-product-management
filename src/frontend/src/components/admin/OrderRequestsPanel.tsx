@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Mail, Phone } from 'lucide-react';
+import { Trash2, Mail, Phone, Banknote, CreditCard, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -88,10 +88,17 @@ export default function OrderRequestsPanel() {
         <CardContent>
           <Accordion type="single" collapsible className="w-full">
             {orders.map((order) => {
-              // Calculate total using bigint arithmetic
-              const total = order.products.reduce((sum, [product, quantity]) => {
+              // Calculate subtotal using bigint arithmetic
+              const subtotal = order.products.reduce((sum, [product, quantity]) => {
                 return sum + (product.price * quantity);
               }, 0n);
+
+              // Calculate total payable (subtotal + shipping)
+              const totalPayable = subtotal + order.shippingFee;
+
+              // Determine payment method display
+              const paymentMethodLabel = order.paymentMethod.__kind__ === 'cod' ? 'COD' : 'UPI';
+              const PaymentIcon = order.paymentMethod.__kind__ === 'cod' ? Banknote : CreditCard;
 
               return (
                 <AccordionItem key={order.id.toString()} value={order.id.toString()}>
@@ -100,10 +107,16 @@ export default function OrderRequestsPanel() {
                       <div className="text-left">
                         <div className="font-semibold">{order.customerName}</div>
                         <div className="text-sm text-muted-foreground">
-                          {order.products.length} item{order.products.length !== 1 ? 's' : ''} • {formatINR(total)}
+                          {order.products.length} item{order.products.length !== 1 ? 's' : ''} • {formatINR(totalPayable)}
                         </div>
                       </div>
-                      <Badge>Order #{order.id.toString()}</Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="gap-1">
+                          <PaymentIcon className="h-3 w-3" />
+                          {paymentMethodLabel}
+                        </Badge>
+                        <Badge>Order #{order.id.toString()}</Badge>
+                      </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
@@ -119,6 +132,51 @@ export default function OrderRequestsPanel() {
                           )}
                           <span>{order.contactDetails}</span>
                         </div>
+                      </div>
+
+                      {/* Delivery Address */}
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-sm flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Delivery Address
+                        </h4>
+                        <div className="ml-6 space-y-1 text-sm">
+                          <div>{order.deliveryAddress.firstLine}</div>
+                          {order.deliveryAddress.landmark && order.deliveryAddress.landmark !== 'Unknown' && (
+                            <div className="text-muted-foreground">
+                              Landmark: {order.deliveryAddress.landmark}
+                            </div>
+                          )}
+                          <div className="font-medium">
+                            {order.deliveryAddress.city}
+                            {order.deliveryAddress.pinCode && order.deliveryAddress.pinCode !== 'Unknown' && (
+                              <span> - {order.deliveryAddress.pinCode}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Payment Method Details */}
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-sm">Payment Method</h4>
+                        <div className="flex items-center gap-2 text-sm">
+                          <PaymentIcon className="h-4 w-4 text-muted-foreground" />
+                          <span>{paymentMethodLabel}</span>
+                        </div>
+                        {order.paymentMethod.__kind__ === 'upi' && (
+                          <div className="ml-6 space-y-1 text-sm text-muted-foreground">
+                            {order.paymentMethod.upi.reference && (
+                              <div>
+                                <span className="font-medium">Reference:</span> {order.paymentMethod.upi.reference}
+                              </div>
+                            )}
+                            {order.paymentMethod.upi.transactionId && (
+                              <div>
+                                <span className="font-medium">Transaction ID:</span> {order.paymentMethod.upi.transactionId}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {/* Products */}
@@ -140,9 +198,21 @@ export default function OrderRequestsPanel() {
                             );
                           })}
                         </div>
-                        <div className="flex justify-between font-semibold pt-2 border-t">
-                          <span>Total</span>
-                          <span className="text-primary">{formatINR(total)}</span>
+                        <div className="space-y-1 pt-2 border-t">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Subtotal</span>
+                            <span className="font-medium">{formatINR(subtotal)}</span>
+                          </div>
+                          {order.shippingFee > 0n && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Shipping</span>
+                              <span className="font-medium">{formatINR(order.shippingFee)}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between font-semibold pt-1">
+                            <span>Total</span>
+                            <span className="text-primary">{formatINR(totalPayable)}</span>
+                          </div>
                         </div>
                       </div>
 

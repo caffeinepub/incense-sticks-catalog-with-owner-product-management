@@ -14,14 +14,14 @@ export default function OrderConfirmationPage() {
             <div className="mx-auto mb-4">
               <CheckCircle2 className="h-16 w-16 text-primary" />
             </div>
-            <CardTitle className="text-3xl font-serif">Order Request Received!</CardTitle>
+            <CardTitle className="text-3xl font-serif">Order Confirmed!</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-6">
             <p className="text-muted-foreground">
-              Thank you for your order request. We've received your information and will contact you shortly to confirm your order and arrange payment.
+              Thank you for your order and payment. We've received your order request along with your UPI payment details.
             </p>
             <p className="text-sm text-muted-foreground">
-              Please check your email or phone for our confirmation message.
+              We will verify your payment and begin processing your order shortly. You'll receive a confirmation message via email or phone.
             </p>
             <div className="pt-4">
               <Button onClick={() => navigate({ to: '/' })} size="lg">

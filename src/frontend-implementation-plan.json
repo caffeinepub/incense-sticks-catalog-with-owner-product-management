@@ -1,57 +1,60 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Normalize INR minor-unit pricing across the frontend to prevent ₹299 showing as ₹2.99",
+  "title": "Location-based shipping fee (₹80 outside Gurugram) in checkout and admin orders",
   "requirements": [
     {
-      "id": "REQ-13",
-      "summary": "Ensure all product and order prices are treated as paise (minor units) in the frontend, including admin create/edit flows and all display locations, so ₹299 renders as ₹299.00 everywhere.",
+      "id": "REQ-35",
+      "summary": "Collect delivery address on OrderRequestPage and apply shipping fee rule (₹0 for Gurugram; ₹80 otherwise) in the order summary and UPI amount-to-pay.",
       "acceptanceCriteria": [
-        "A product whose intended price is ₹299 displays as \"₹299.00\" in the storefront catalog cards and on the product detail page.",
-        "A product whose intended price is ₹299 displays as \"₹299.00\" in the admin product list and in admin order request totals/line items (wherever prices are shown).",
-        "Creating or editing a product in the admin UI using a rupee amount of \"299\" (or \"299.00\") results in a stored value that displays as \"₹299.00\" everywhere in the app.",
-        "No UI location displays ₹2.99 for products intended to be priced at ₹299."
+        "OrderRequestPage includes delivery fields with clear English labels (at minimum: \"Delivery Address\" and \"Delivery City\").",
+        "Delivery City input drives shipping: when the city equals \"Gurugram\" (ignoring case/whitespace), shipping shown is ₹0; otherwise shipping shown is ₹80.",
+        "The order summary shows a clear breakdown: Items subtotal, Shipping, and Total payable, all formatted in INR using the existing formatter.",
+        "The \"Amount to Pay\" displayed in the UPI payment section uses the total payable amount (subtotal + shipping).",
+        "Form validation prevents submission when required delivery fields are empty, with user-facing errors in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/currency.ts",
-          "operation": "modify",
-          "description": "Add a shared price-normalization utility to consistently interpret backend-provided bigint prices as paise for display and calculations (including a defensive fallback for legacy/incorrect rupee-scaled stored values), and update formatINR to format normalized paise values."
-        },
-        {
-          "path": "frontend/src/hooks/useProducts.ts",
-          "operation": "modify",
-          "description": "Normalize Product.price values returned from product list queries before they reach UI components, so catalog/admin lists render correct INR values consistently."
-        },
-        {
-          "path": "frontend/src/hooks/useProduct.ts",
-          "operation": "modify",
-          "description": "Normalize the single Product.price value returned from the product detail query so the product detail page always formats the correct INR amount."
-        },
-        {
-          "path": "frontend/src/hooks/useOrderRequests.ts",
-          "operation": "modify",
-          "description": "Normalize Product.price values inside fetched OrderRequest product line items so admin order totals/line items compute and render correctly even if stored data is mis-scaled."
-        },
-        {
-          "path": "frontend/src/components/admin/ProductEditorDialog.tsx",
-          "operation": "modify",
-          "description": "When populating the edit form, display the rupee amount derived from a normalized paise value (so a stored 299 is shown as 299.00 instead of 2.99), and ensure submit continues converting rupee input to paise BigInt consistently."
-        },
-        {
-          "path": "frontend/src/hooks/useOrderDraft.ts",
-          "operation": "modify",
-          "description": "Ensure products added to the local order draft store a normalized paise price to keep cart/order calculations consistent across sessions and after any data refreshes."
+          "path": "frontend/src/utils/shipping.ts",
+          "operation": "create",
+          "description": "Add a small shipping utility to compute the shipping fee in paise (BigInt) using the rule: trimmed, case-insensitive comparison to \"Gurugram\" => 0n else 8000n; include a helper to normalize/compare city input while preserving paise-based calculations."
         },
         {
           "path": "frontend/src/pages/OrderRequestPage.tsx",
           "operation": "modify",
-          "description": "Update subtotal/line-item total calculations to use normalized paise values (prefer bigint arithmetic over Number conversions) so totals always match formatted INR output."
+          "description": "Add delivery address state and inputs (at minimum Delivery Address and Delivery City, English labels), validate required delivery fields before submission with English toast errors, compute subtotal/shipping/total payable using BigInt paise arithmetic, render an order summary breakdown (Items subtotal, Shipping, Total payable) using formatINR, and update the UPI \"Amount to Pay\" to use total payable (subtotal + computed shipping)."
+        },
+        {
+          "path": "frontend/src/hooks/useOrderRequests.ts",
+          "operation": "modify",
+          "description": "Extend the submit-order hook params to accept delivery address fields and pass deliveryAddress to the backend submitOrderRequest call (using Address shape and paise-based approach; do not send a client-computed shipping fee for correctness)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "summary": "Include delivery address/city in the order submission payload and display delivery details plus totals including shipping in the admin Order Requests UI.",
+      "acceptanceCriteria": [
+        "Order submission includes delivery address data so it is persisted with the order request and visible to the admin.",
+        "Admin Order Requests view shows delivery address details for each order (at minimum: delivery city and full delivery address).",
+        "Admin Order Requests totals reflect subtotal + shipping, and shipping is displayed as a separate line item when non-zero.",
+        "All displayed monetary values are formatted consistently in INR."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/OrderRequestPage.tsx",
+          "operation": "modify",
+          "description": "Update the submit payload to include deliveryAddress (including delivery city and full delivery address; populate any additional required Address fields with safe strings if not collected) so the backend can persist it with the order request."
         },
         {
           "path": "frontend/src/components/admin/OrderRequestsPanel.tsx",
           "operation": "modify",
-          "description": "Update order total and line-item computations to use normalized paise values (prefer bigint arithmetic) and render with the shared INR formatter to prevent ₹2.99-style mis-displays in the admin panel."
+          "description": "Update admin order rendering to show delivery address details (at minimum delivery city and full delivery address) and update totals to reflect subtotal + shippingFee; display Shipping as a separate line item when shippingFee is non-zero; ensure all money values use formatINR and the accordion header total reflects total payable."
+        },
+        {
+          "path": "frontend/src/utils/shipping.ts",
+          "operation": "modify",
+          "description": "Export any additional helpers needed by admin UI (if applicable) to compute and/or label totals consistently while keeping BigInt paise handling; ensure usage stays aligned with the Gurugram rule."
         }
       ]
     }

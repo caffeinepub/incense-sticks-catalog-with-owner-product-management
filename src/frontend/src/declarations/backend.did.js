@@ -13,6 +13,20 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const Address = IDL.Record({
+  'city' : IDL.Text,
+  'pinCode' : IDL.Text,
+  'landmark' : IDL.Text,
+  'firstLine' : IDL.Text,
+});
+export const UpiPaymentData = IDL.Record({
+  'reference' : IDL.Opt(IDL.Text),
+  'transactionId' : IDL.Opt(IDL.Text),
+});
+export const PaymentMethod = IDL.Variant({
+  'cod' : IDL.Null,
+  'upi' : UpiPaymentData,
+});
 export const Product = IDL.Record({
   'id' : IDL.Nat,
   'inStock' : IDL.Bool,
@@ -25,7 +39,10 @@ export const Product = IDL.Record({
 export const OrderRequest = IDL.Record({
   'id' : IDL.Nat,
   'customerName' : IDL.Text,
+  'deliveryAddress' : Address,
+  'paymentMethod' : PaymentMethod,
   'note' : IDL.Opt(IDL.Text),
+  'shippingFee' : IDL.Nat,
   'products' : IDL.Vec(IDL.Tuple(Product, IDL.Nat)),
   'contactDetails' : IDL.Text,
 });
@@ -61,6 +78,8 @@ export const idlService = IDL.Service({
         IDL.Text,
         IDL.Text,
         IDL.Opt(IDL.Text),
+        Address,
+        PaymentMethod,
       ],
       [IDL.Nat],
       [],
@@ -81,6 +100,20 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const Address = IDL.Record({
+    'city' : IDL.Text,
+    'pinCode' : IDL.Text,
+    'landmark' : IDL.Text,
+    'firstLine' : IDL.Text,
+  });
+  const UpiPaymentData = IDL.Record({
+    'reference' : IDL.Opt(IDL.Text),
+    'transactionId' : IDL.Opt(IDL.Text),
+  });
+  const PaymentMethod = IDL.Variant({
+    'cod' : IDL.Null,
+    'upi' : UpiPaymentData,
+  });
   const Product = IDL.Record({
     'id' : IDL.Nat,
     'inStock' : IDL.Bool,
@@ -93,7 +126,10 @@ export const idlFactory = ({ IDL }) => {
   const OrderRequest = IDL.Record({
     'id' : IDL.Nat,
     'customerName' : IDL.Text,
+    'deliveryAddress' : Address,
+    'paymentMethod' : PaymentMethod,
     'note' : IDL.Opt(IDL.Text),
+    'shippingFee' : IDL.Nat,
     'products' : IDL.Vec(IDL.Tuple(Product, IDL.Nat)),
     'contactDetails' : IDL.Text,
   });
@@ -129,6 +165,8 @@ export const idlFactory = ({ IDL }) => {
           IDL.Text,
           IDL.Text,
           IDL.Opt(IDL.Text),
+          Address,
+          PaymentMethod,
         ],
         [IDL.Nat],
         [],

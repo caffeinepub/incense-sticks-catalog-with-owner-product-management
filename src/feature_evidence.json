@@ -2,17 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-product-price-scaling-so-a-product-intended-to-cost-299-displays-as-299-not-2-99-across-the-entire-app-by-ensuring-the-backend-stored-product-price-value-is-consistently-represented-in-paise-minor-units-to-match-the-existing-frontend-formatter-formatinr-price-bigint-that-divides-by-100",
-      "featureTitle": "Fix the product price scaling so a product intended to cost ₹299 displays as ₹299 (not ₹2.99) across the entire app, by ensuring the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter `formatINR(price: bigint)` that divides by 100.",
+      "featureId": "feature-update-the-customer-checkout-orderrequestpage-to-collect-delivery-address-details-and-apply-a-location-based-shipping-fee-rule-if-the-delivery-city-is-not-gurugram-case-insensitive-trimmed-comparison-add-a-shipping-charge-of-80-to-the-payable-total-if-it-is-gurugram-shipping-is-0",
+      "featureTitle": "Update the customer checkout (OrderRequestPage) to collect delivery address details and apply a location-based shipping fee rule: if the delivery city is not \"Gurugram\" (case-insensitive, trimmed comparison), add a shipping charge of ₹80 to the payable total; if it is Gurugram, shipping is ₹0.",
       "files": [
-        "frontend/src/components/admin/OrderRequestsPanel.tsx",
-        "frontend/src/components/admin/ProductEditorDialog.tsx",
-        "frontend/src/hooks/useOrderDraft.ts",
         "frontend/src/hooks/useOrderRequests.ts",
-        "frontend/src/hooks/useProduct.ts",
-        "frontend/src/hooks/useProducts.ts",
         "frontend/src/pages/OrderRequestPage.tsx",
-        "frontend/src/utils/currency.ts"
+        "frontend/src/utils/shipping.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -23,7 +18,28 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-13"
+        "REQ-35"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-extend-order-submission-payload-from-the-frontend-to-include-the-entered-delivery-address-city-and-any-necessary-derived-shipping-info-and-update-the-admin-order-requests-ui-to-display-delivery-address-details-and-show-totals-including-shipping",
+      "featureTitle": "Extend order submission payload from the frontend to include the entered delivery address/city (and any necessary derived shipping info), and update the admin Order Requests UI to display delivery address details and show totals including shipping.",
+      "files": [
+        "frontend/src/components/admin/OrderRequestsPanel.tsx",
+        "frontend/src/pages/OrderRequestPage.tsx",
+        "frontend/src/utils/shipping.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-36"
       ],
       "confidence": "high"
     }

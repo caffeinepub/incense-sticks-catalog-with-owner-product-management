@@ -1,6 +1,7 @@
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Text "mo:core/Text";
+import Array "mo:core/Array";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
@@ -19,11 +20,28 @@ actor {
   public type Product = {
     id : Nat;
     name : Text;
-    price : Nat; // Price is now in paise (minor units)
+    price : Nat;
     description : Text;
     scent : Text;
     inStock : Bool;
     photoUrl : Text;
+  };
+
+  public type Address = {
+    firstLine : Text;
+    landmark : Text;
+    city : Text;
+    pinCode : Text;
+  };
+
+  public type PaymentMethod = {
+    #cod;
+    #upi : UpiPaymentData;
+  };
+
+  public type UpiPaymentData = {
+    reference : ?Text;
+    transactionId : ?Text;
   };
 
   public type OrderRequest = {
@@ -32,6 +50,9 @@ actor {
     customerName : Text;
     contactDetails : Text;
     note : ?Text;
+    deliveryAddress : Address;
+    shippingFee : Nat;
+    paymentMethod : PaymentMethod;
   };
 
   let userProfiles = Map.empty<Principal, UserProfile>();
@@ -75,7 +96,7 @@ actor {
     let product : Product = {
       id = productId;
       name;
-      price; // Store price directly in paise (minor units)
+      price;
       description;
       scent;
       inStock = true;
@@ -98,7 +119,7 @@ actor {
     let updatedProduct : Product = {
       id = existingProduct.id;
       name;
-      price; // Store price directly in paise (minor units)
+      price;
       description;
       scent;
       inStock = existingProduct.inStock;
@@ -150,9 +171,39 @@ actor {
   };
 
   // Order Submission (Public - allows anonymous orders)
-  public shared func submitOrderRequest(productsWithQuantity : [(Product, Nat)], customerName : Text, contactDetails : Text, note : ?Text) : async Nat {
+  public shared func submitOrderRequest(
+    productsWithQuantity : [(Product, Nat)],
+    customerName : Text,
+    contactDetails : Text,
+    note : ?Text,
+    deliveryAddress : Address,
+    paymentMethod : PaymentMethod,
+  ) : async Nat {
+    switch (paymentMethod) {
+      case (#cod) {
+        Runtime.trap("COD submissions are no longer accepted. Please use UPI payments.");
+      };
+      case (#upi(upiData)) {
+        let hasValidReference = switch (upiData.reference) {
+          case (null) { false };
+          case (?ref) { ref.size() > 0 };
+        };
+        let hasValidTransactionId = switch (upiData.transactionId) {
+          case (null) { false };
+          case (?txId) { txId.size() > 0 };
+        };
+
+        if (not hasValidReference and not hasValidTransactionId) {
+          Runtime.trap("At least one non-empty UPI detail (reference or transactionId) must be provided");
+        };
+      };
+    };
+
     let orderId = nextOrderRequestId;
     nextOrderRequestId += 1;
+
+    // Calculate shipping fee (₹80 = 8000 paise) if not Gurugram
+    let shippingFee : Nat = if (not isGurugram(deliveryAddress.city)) { 8000 } else { 0 };
 
     let orderRequest : OrderRequest = {
       id = orderId;
@@ -160,10 +211,27 @@ actor {
       customerName;
       contactDetails;
       note;
+      deliveryAddress;
+      shippingFee;
+      paymentMethod;
     };
 
     orderRequests.add(orderId, orderRequest);
     orderId;
+  };
+
+  // Helper function: check if city is "Gurugram" (case-insensitive)
+  func isGurugram(city : Text) : Bool {
+    let normalizedCity = city.toLower();
+    let gurugramVariants = [
+      "gurugram",
+      "gurgram",
+      "gurgaon",
+      "gurugram, haryana",
+      "gurgram, haryana",
+      "gurgaon, haryana",
+    ];
+    gurugramVariants.any(func(variant) { normalizedCity.contains(#text(variant)) });
   };
 
   // Order Management (Admin-only)

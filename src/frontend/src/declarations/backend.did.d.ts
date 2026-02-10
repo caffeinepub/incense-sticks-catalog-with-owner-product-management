@@ -10,13 +10,24 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface Address {
+  'city' : string,
+  'pinCode' : string,
+  'landmark' : string,
+  'firstLine' : string,
+}
 export interface OrderRequest {
   'id' : bigint,
   'customerName' : string,
+  'deliveryAddress' : Address,
+  'paymentMethod' : PaymentMethod,
   'note' : [] | [string],
+  'shippingFee' : bigint,
   'products' : Array<[Product, bigint]>,
   'contactDetails' : string,
 }
+export type PaymentMethod = { 'cod' : null } |
+  { 'upi' : UpiPaymentData };
 export interface Product {
   'id' : bigint,
   'inStock' : boolean,
@@ -25,6 +36,10 @@ export interface Product {
   'photoUrl' : string,
   'scent' : string,
   'price' : bigint,
+}
+export interface UpiPaymentData {
+  'reference' : [] | [string],
+  'transactionId' : [] | [string],
 }
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
@@ -50,7 +65,14 @@ export interface _SERVICE {
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'submitOrderRequest' : ActorMethod<
-    [Array<[Product, bigint]>, string, string, [] | [string]],
+    [
+      Array<[Product, bigint]>,
+      string,
+      string,
+      [] | [string],
+      Address,
+      PaymentMethod,
+    ],
     bigint
   >,
   'toggleProductStock' : ActorMethod<[bigint], undefined>,

@@ -1,40 +1,109 @@
 {
   "kind": "build_request",
-  "title": "Fix INR price scaling so ₹299 does not display as ₹2.99",
+  "title": "Add ₹80 shipping fee for delivery outside Gurugram",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-13",
-      "text": "Fix the product price scaling so a product intended to cost ₹299 displays as ₹299 (not ₹2.99) across the entire app, by ensuring the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter `formatINR(price: bigint)` that divides by 100.",
-      "target": "both",
+      "id": "REQ-35",
+      "text": "Update the customer checkout (OrderRequestPage) to collect delivery address details and apply a location-based shipping fee rule: if the delivery city is not \"Gurugram\" (case-insensitive, trimmed comparison), add a shipping charge of ₹80 to the payable total; if it is Gurugram, shipping is ₹0.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Make the price from ₹2.99 to ₹299"
+          "And if the delivery adress is outside from gurugram add shipping cost :₹80"
         ]
       },
       "acceptanceCriteria": [
-        "A product whose intended price is ₹299 displays as \"₹299.00\" in the storefront catalog cards and on the product detail page.",
-        "A product whose intended price is ₹299 displays as \"₹299.00\" in the admin product list and in admin order request totals/line items (wherever prices are shown).",
-        "Creating or editing a product in the admin UI using a rupee amount of \"299\" (or \"299.00\") results in a stored value that displays as \"₹299.00\" everywhere in the app.",
-        "No UI location displays ₹2.99 for products intended to be priced at ₹299."
+        "OrderRequestPage includes delivery fields with clear English labels (at minimum: \"Delivery Address\" and \"Delivery City\").",
+        "Delivery City input drives shipping: when the city equals \"Gurugram\" (ignoring case/whitespace), shipping shown is ₹0; otherwise shipping shown is ₹80.",
+        "The order summary shows a clear breakdown: Items subtotal, Shipping, and Total payable, all formatted in INR using the existing formatter.",
+        "The \"Amount to Pay\" displayed in the UPI payment section uses the total payable amount (subtotal + shipping).",
+        "Form validation prevents submission when required delivery fields are empty, with user-facing errors in English."
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "text": "Extend order submission payload from the frontend to include the entered delivery address/city (and any necessary derived shipping info), and update the admin Order Requests UI to display delivery address details and show totals including shipping.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "And if the delivery adress is outside from gurugram add shipping cost :₹80"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Order submission includes delivery address data so it is persisted with the order request and visible to the admin.",
+        "Admin Order Requests view shows delivery address details for each order (at minimum: delivery city and full delivery address).",
+        "Admin Order Requests totals reflect subtotal + shipping, and shipping is displayed as a separate line item when non-zero.",
+        "All displayed monetary values are formatted consistently in INR."
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "text": "Update the backend OrderRequest model and submitOrderRequest method to store delivery details and a shipping fee amount, and compute/enforce the shipping fee rule on the backend: shippingFee = 8000 paise (₹80) when delivery city is outside Gurugram; otherwise 0 paise.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "And if the delivery adress is outside from gurugram add shipping cost :₹80"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend OrderRequest type includes new fields for delivery address details and a stored shipping fee value in paise (minor units).",
+        "Backend submitOrderRequest accepts delivery address inputs and sets shippingFee based on the delivery city rule (outside Gurugram => 8000 paise, inside Gurugram => 0).",
+        "Backend does not rely on a client-sent shipping fee amount for correctness; it computes the stored shipping fee from the delivery city rule.",
+        "Existing payment enforcement remains unchanged (COD rejected; UPI requires at least one non-empty detail)."
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Add a conditional migration to preserve existing canister state when upgrading the OrderRequest schema to include delivery fields and shipping fee, ensuring existing stored orders remain readable.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "And if the delivery adress is outside from gurugram add shipping cost :₹80"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A backend/migration.mo file is added (per the project migration policy) to migrate existing OrderRequest entries to the new schema.",
+        "For pre-existing orders, new fields are populated with safe defaults (e.g., empty address/city and shippingFee = 0) so admin order listing continues to work after upgrade.",
+        "Upgrade does not trap due to missing fields in old state."
       ]
     }
   ],
   "constraints": [
     "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit files under frontend/src/components/ui or any paths listed in frontend.immutablePaths.",
-    "Use English for any user-facing text."
+    "Do not modify frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, and anything under frontend/src/components/ui.",
+    "All user-facing text added/changed must be in English.",
+    "All currency amounts must remain consistent with the app’s paise-based storage/BigInt formatting approach on the frontend."
   ],
   "nonGoals": [
-    "Adding new payment or checkout features.",
-    "Changing the currency away from INR.",
-    "Redesigning the storefront/admin UI beyond what is necessary to correct the displayed price."
+    "Implementing full address validation (pincode lookup, geocoding, or maps).",
+    "Integrating third-party shipping providers or dynamic shipping rates.",
+    "Changing payment flow beyond adjusting the payable amount to include shipping.",
+    "Adding WhatsApp/SMS/email notifications."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }
