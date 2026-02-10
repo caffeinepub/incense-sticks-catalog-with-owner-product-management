@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 11,
+  "summary": "Build an app for people who want to buy incense sticks, with the ability for the owner to add/manage products.",
+  "architectural_notes": [],
+  "known_issues": [
+    "Storefront displays 'no products available' because no active products are present/seeded until products are added via admin.",
+    "Product price is incorrectly displayed as ₹2.99 instead of ₹299 (likely decimal/scaling/formatting issue)."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-create-a-public-storefront-that-lets-visitors-browse-incense-stick-products-in-a-clean-product-catalog-including-product-list-and-product-detail-views-with-name-price-description-scent-type-stock-availability-in-stock-out-of-stock-and-product-image",
+      "title": "Create a public storefront that lets visitors browse incense stick products in a clean product catalog, including product list and product detail views with: name, price, description, scent/type, stock availability (in stock/out of stock), and product image.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-owner-authentication-using-internet-identity-and-restrict-product-management-features-to-an-owner-admin-account",
+      "title": "Implement owner authentication using Internet Identity and restrict product management features to an owner/admin account.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-owner-admin-dashboard-for-product-management-with-full-crud-create-new-products-edit-existing-products-delete-products-and-toggle-in-stock-out-of-stock",
+      "title": "Add an owner/admin dashboard for product management with full CRUD: create new products, edit existing products, delete products, and toggle in-stock/out-of-stock.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-lightweight-product-discovery-ux-in-the-storefront-search-by-name-and-filter-by-scent-type-or-category-using-frontend-state-without-requiring-external-services",
+      "title": "Add lightweight product discovery UX in the storefront: search by name and filter by scent/type (or category) using frontend state, without requiring external services.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-simple-order-request-flow-no-online-payments-visitors-can-submit-an-order-request-containing-selected-products-with-quantities-and-contact-details-name-email-or-phone-optional-note-store-submitted-requests-in-the-backend-so-the-owner-can-review-them-in-the-admin-dashboard",
+      "title": "Add a simple order/request flow (no online payments): visitors can submit an order request containing selected products with quantities and contact details (name, email or phone, optional note). Store submitted requests in the backend so the owner can review them in the admin dashboard.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-establish-a-coherent-visual-theme-for-the-app-colors-typography-spacing-and-component-styling-appropriate-for-an-incense-brand-warm-earthy-minimal-and-apply-it-consistently-across-storefront-and-admin-pages-avoid-blue-purple-as-primary-colors",
+      "title": "Establish a coherent visual theme for the app (colors, typography, spacing, and component styling) appropriate for an incense brand (warm, earthy, minimal), and apply it consistently across storefront and admin pages (avoid blue/purple as primary colors).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-generated-static-image-assets-logo-and-hero-branding-visuals-and-render-them-in-the-ui-from-frontend-public-assets-generated-do-not-serve-generated-images-via-the-backend",
+      "title": "Add generated static image assets (logo and hero/branding visuals) and render them in the UI from frontend/public/assets/generated (do not serve generated images via the backend).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-storefront-no-longer-displays-the-default-empty-state-text-no-products-available-at-the-moment-when-the-app-is-freshly-deployed-by-relying-on-the-seeded-products-being-returned-from-the-backend",
+      "title": "Ensure the storefront no longer displays the default empty state text \"No products available at the moment.\" when the app is freshly deployed, by relying on the seeded products being returned from the backend.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-all-visible-brand-site-naming-to-harmony-incense-across-the-storefront-and-admin-ui-including-the-header-brand-text-footer-copyright-text-and-the-html-document-title",
+      "title": "Update all visible brand/site naming to \"Harmony Incense\" across the storefront and admin UI, including the header brand text, footer copyright text, and the HTML document title.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-product-prices-in-indian-rupees-consistently-across-the-entire-app-storefront-catalog-product-detail-order-review-checkout-pages-admin-product-list-and-admin-order-requests-using-a-single-consistent-formatting-rule-based-on-the-backend-stored-value",
+      "title": "Display product prices in Indian Rupees (₹) consistently across the entire app (storefront catalog, product detail, order review/checkout pages, admin product list, and admin order requests), using a single consistent formatting rule based on the backend stored value.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-product-editor-ui-to-use-inr-terminology-and-formatting-e-g-label-the-price-field-for-inr-rather-than-usd-while-keeping-the-stored-numeric-representation-consistent-with-the-rest-of-the-app",
+      "title": "Update the admin product editor UI to use INR terminology and formatting (e.g., label the price field for INR rather than USD) while keeping the stored numeric representation consistent with the rest of the app.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-product-price-scaling-so-a-product-intended-to-cost-299-displays-as-299-not-2-99-across-the-entire-app-by-ensuring-the-backend-stored-product-price-value-is-consistently-represented-in-paise-minor-units-to-match-the-existing-frontend-formatter-formatinr-price-bigint-that-divides-by-100",
+      "title": "Fix the product price scaling so a product intended to cost ₹299 displays as ₹299 (not ₹2.99) across the entire app, by ensuring the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter `formatINR(price: bigint)` that divides by 100.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Incense sticks shopping app with product catalog and ability for owner to add/manage products",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Seed the storefront with initial products (Lavender, Vanilla, Lemongrass, Jasmine at ₹299) so it doesn’t show 'no products available' on first load",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Seed the backend product catalog with the initial products so a fresh deployment does not show the empty-state message on the storefront. Seed exactly these 4 products (in stock): Lavender incense stick – ₹299; Vanilla incense stick – ₹299; Lemongrass incense stick – ₹299; Jasmine incense stick – ₹299.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Rename the website/brand to \"Harmony Incense\" and display product prices in Indian Rupees (₹) across the storefront/admin",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Harmony Incense",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

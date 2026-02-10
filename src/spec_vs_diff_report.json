@@ -1,0 +1,54 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-10T12:17:36.878Z",
+  "summary": "The diff fixes INR display mostly by normalizing prices on the frontend (treating small values as rupees and multiplying by 100) and by converting admin-entered rupee amounts to paise before sending to the backend. However, it does not clearly ensure that the backend-stored `Product.price` values are consistently in paise; the added migration is a no-op and backend create/update still store the provided value without conversion or validation.",
+  "missing_requirements": [
+    {
+      "id": "REQ-13",
+      "requirement": "Ensure the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter that divides by 100, so ₹299 displays as ₹299.00 everywhere.",
+      "reason": "Backend `createProduct`/`updateProduct` store the incoming `price` as-is, and the added migration module returns state unchanged. The fix relies on frontend heuristics and admin-side conversion rather than making backend storage consistently paise across existing data.",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo",
+        "frontend/src/utils/currency.ts"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Frontend heuristic to auto-normalize legacy prices by multiplying any price < 1000 by 100 (assumes values are rupees if under ₹10.00 in paise).",
+      "reason": "REQ-13 specifies fixing scaling by ensuring backend-stored prices are consistently in paise; this heuristic-based client-side normalization is an extra behavior not requested and may alter semantics for legitimately low-priced items.",
+      "evidence": [
+        "frontend/src/utils/currency.ts",
+        "frontend/src/hooks/useProducts.ts",
+        "frontend/src/hooks/useProduct.ts",
+        "frontend/src/hooks/useOrderRequests.ts",
+        "frontend/src/hooks/useOrderDraft.ts"
+      ]
+    },
+    {
+      "description": "Introduced a backend migration module and wired a migration hook, but the migration performs no transformation.",
+      "reason": "REQ-13 did not request adding a migration framework; and the added migration does not implement the needed paise conversion for existing stored product prices.",
+      "evidence": [
+        "backend/migration.mo",
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "confidence": 0.72,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/admin/OrderRequestsPanel.tsx",
+    "frontend/src/components/admin/ProductEditorDialog.tsx",
+    "frontend/src/hooks/useOrderDraft.ts",
+    "frontend/src/hooks/useOrderRequests.ts",
+    "frontend/src/hooks/useProduct.ts",
+    "frontend/src/hooks/useProducts.ts",
+    "frontend/src/pages/OrderRequestPage.tsx",
+    "frontend/src/utils/currency.ts",
+    "project_state.json"
+  ]
+}

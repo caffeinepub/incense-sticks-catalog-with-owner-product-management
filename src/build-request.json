@@ -1,0 +1,40 @@
+{
+  "kind": "build_request",
+  "title": "Fix INR price scaling so ₹299 does not display as ₹2.99",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-13",
+      "text": "Fix the product price scaling so a product intended to cost ₹299 displays as ₹299 (not ₹2.99) across the entire app, by ensuring the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter `formatINR(price: bigint)` that divides by 100.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Make the price from ₹2.99 to ₹299"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A product whose intended price is ₹299 displays as \"₹299.00\" in the storefront catalog cards and on the product detail page.",
+        "A product whose intended price is ₹299 displays as \"₹299.00\" in the admin product list and in admin order request totals/line items (wherever prices are shown).",
+        "Creating or editing a product in the admin UI using a rupee amount of \"299\" (or \"299.00\") results in a stored value that displays as \"₹299.00\" everywhere in the app.",
+        "No UI location displays ₹2.99 for products intended to be priced at ₹299."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit files under frontend/src/components/ui or any paths listed in frontend.immutablePaths.",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Adding new payment or checkout features.",
+    "Changing the currency away from INR.",
+    "Redesigning the storefront/admin UI beyond what is necessary to correct the displayed price."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

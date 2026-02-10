@@ -1,0 +1,31 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-fix-the-product-price-scaling-so-a-product-intended-to-cost-299-displays-as-299-not-2-99-across-the-entire-app-by-ensuring-the-backend-stored-product-price-value-is-consistently-represented-in-paise-minor-units-to-match-the-existing-frontend-formatter-formatinr-price-bigint-that-divides-by-100",
+      "featureTitle": "Fix the product price scaling so a product intended to cost ₹299 displays as ₹299 (not ₹2.99) across the entire app, by ensuring the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter `formatINR(price: bigint)` that divides by 100.",
+      "files": [
+        "frontend/src/components/admin/OrderRequestsPanel.tsx",
+        "frontend/src/components/admin/ProductEditorDialog.tsx",
+        "frontend/src/hooks/useOrderDraft.ts",
+        "frontend/src/hooks/useOrderRequests.ts",
+        "frontend/src/hooks/useProduct.ts",
+        "frontend/src/hooks/useProducts.ts",
+        "frontend/src/pages/OrderRequestPage.tsx",
+        "frontend/src/utils/currency.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-13"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

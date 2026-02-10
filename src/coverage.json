@@ -1,0 +1,60 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-10T12:17:36.880Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 1,
+    "implemented": 1,
+    "items": [
+      {
+        "id": "REQ-13",
+        "summary": "Fix the product price scaling so a product intended to cost ₹299 displays as ₹299 (not ₹2.99) across the entire app, by ensuring the backend-stored product `price` value is consistently represented in paise (minor units) to match the existing frontend formatter `formatINR(price: bigint)` that divides by 100.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/currency.ts",
+          "frontend/src/hooks/useProducts.ts",
+          "frontend/src/hooks/useProduct.ts",
+          "frontend/src/hooks/useOrderRequests.ts",
+          "frontend/src/components/admin/ProductEditorDialog.tsx",
+          "frontend/src/hooks/useOrderDraft.ts",
+          "frontend/src/pages/OrderRequestPage.tsx",
+          "frontend/src/components/admin/OrderRequestsPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/currency.ts",
+          "frontend/src/hooks/useProducts.ts",
+          "frontend/src/hooks/useProduct.ts",
+          "frontend/src/hooks/useOrderRequests.ts",
+          "frontend/src/components/admin/ProductEditorDialog.tsx",
+          "frontend/src/hooks/useOrderDraft.ts",
+          "frontend/src/pages/OrderRequestPage.tsx",
+          "frontend/src/components/admin/OrderRequestsPanel.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/admin/OrderRequestsPanel.tsx",
+    "frontend/src/components/admin/ProductEditorDialog.tsx",
+    "frontend/src/hooks/useOrderDraft.ts",
+    "frontend/src/hooks/useOrderRequests.ts",
+    "frontend/src/hooks/useProduct.ts",
+    "frontend/src/hooks/useProducts.ts",
+    "frontend/src/pages/OrderRequestPage.tsx",
+    "frontend/src/utils/currency.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}
